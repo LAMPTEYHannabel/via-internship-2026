@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# @title   Task3_log_analysis.sh
+# @author  LAMPTEY AKWELEY HANNABEL
+# @index  4191424
+# @school KWAME NKRUMAH UNIVERSITY OF SCIENCE AND TECHNOLOGY (KNUST)
+# @description  geberates log data and performs text-processing analysi
+# @date 14-09-2026
+
+LOG_FILE="sample.log"
+ERROR_LOG="errors.log"
+#Clear old logs if they exist 
+> "$ERROR_LOG"
+
+# 1. Generate log data using a heredoc (at least 50 lines)
+cat << 'EOF' > "$LOG_FILE"
+2026-09-14 08:00:01 INFO 192.168.1.10 User login successful
+2026-09-14 08:00:05 WARN 192.168.1.11 High memory usage detected
+2026-09-14 08:00:10 ERROR 192.168.1.12 Failed database connection
+2026-09-14 08:01:02 INFO 192.168.1.10 Page requested /dashboard
+2026-09-14 08:01:15 INFO 192.168.1.13 User login successful
+2026-09-14 08:02:00 WARN 192.168.1.10 Disk space low
+2026-09-14 08:02:10 ERROR 192.168.1.14 Unauthorized access attempt
+2026-09-14 08:03:00 INFO 192.168.1.10 File uploaded
+2026-09-14 08:03:45 INFO 192.168.1.11 User logout
+2026-09-14 08:04:12 ERROR 192.168.1.12 Timeout waiting for service
+2026-09-14 08:05:01 INFO 192.168.1.10 User login successful
+2026-09-14 08:05:30 WARN 192.168.1.15 CPU threshold exceeded
+2026-09-14 08:06:00 INFO 192.168.1.13 Session refreshed
+2026-09-14 08:06:14 ERROR 192.168.1.10 Invalid token provided
+2026-09-14 08:07:01 INFO 192.168.1.11 Page requested /settings
+2026-09-14 08:07:22 WARN 192.168.1.12 Slow response time
+2026-09-14 08:08:05 ERROR 192.168.1.14 Permission denied
+2026-09-14 08:08:40 INFO 192.168.1.10 Data exported
+2026-09-14 08:09:12 INFO 192.168.1.13 User login successful
+2026-09-14 08:09:55 WARN 192.168.1.10 Network packet loss
+2026-09-14 08:10:00 ERROR 192.168.1.12 Database timeout
+2026-09-14 08:10:30 INFO 192.168.1.11 User session timeout
+2026-09-14 08:11:05 INFO 192.168.1.10 Requested resource /api/v1
+2026-09-14 08:11:40 WARN 192.168.1.15 High CPU usage
+2026-09-14 08:12:10 ERROR 192.168.1.10 Internal server error
+2026-09-14 08:12:50 INFO 192.168.1.13 User password changed
+2026-09-14 08:13:15 WARN 192.168.1.11 Deprecated API call
+2026-09-14 08:14:00 ERROR 192.168.1.14 Service unavailable
+2026-09-14 08:14:30 INFO 192.168.1.10 File downloaded
+2026-09-14 08:15:00 INFO 192.168.1.12 User login successful
+2026-09-14 08:15:45 WARN 192.168.1.10 Connection retry limit reached
+2026-09-14 08:16:10 ERROR 192.168.1.13 SSL handshake failed
+2026-09-14 08:17:00 INFO 192.168.1.11 User logout
+2026-09-14 08:17:35 WARN 192.168.1.15 Cache hit ratio low
+2026-09-14 08:18:00 ERROR 192.168.1.10 Out of memory error
+2026-09-14 08:18:40 INFO 192.168.1.12 Page requested /home
+2026-09-14 08:19:10 INFO 192.168.1.10 User login successful
+2026-09-14 08:19:50 WARN 192.168.1.14 Storage quota near limit
+2026-09-14 08:20:15 ERROR 192.168.1.11 Service restart failed
+2026-09-14 08:21:00 INFO 192.168.1.13 Query executed successfully
+2026-09-14 08:21:30 WARN 192.168.1.10 Latency spike detected
+2026-09-14 08:22:05 ERROR 192.168.1.12 Connection reset by peer
+2026-09-14 08:22:45 INFO 192.168.1.11 User login successful
+2026-09-14 08:23:10 INFO 192.168.1.10 Profile updated
+2026-09-14 08:23:50 WARN 192.168.1.15 Firewall rule triggered
+2026-09-14 08:24:15 ERROR 192.168.1.10 Bad request 400
+2026-09-14 08:25:00 INFO 192.168.1.13 User logout
+2026-09-14 08:25:30 WARN 192.168.1.12 High disk I/O
+2026-09-14 08:26:00 ERROR 192.168.1.14 Payment gateway timeout
+2026-09-14 08:26:40 INFO 192.168.1.10 Report generated
+EOF
+
+echo "Log file generated successfully with $(wc -l < "$LOG_FILE") lines."
+echo ""
+
+# 2. Total line count
+TOTAL_LINES=$(wc -l < "$LOG_FILE" 2>> "$ERROR_LOG")
+echo "Total Log Entries: $TOTAL_LINES"
+echo "-----------------------------------"
+
+# 3. Log counts per level
+INFO_COUNT=$(grep -c "INFO" "$LOG_FILE" 2>> "$ERROR_LOG")
+WARN_COUNT=$(grep -c "WARN" "$LOG_FILE" 2>> "$ERROR_LOG")
+ERROR_COUNT=$(grep -c "ERROR" "$LOG_FILE" 2>> "$ERROR_LOG")
+
+echo "Log Level Summary:"
+echo "  INFO  : $INFO_COUNT"
+echo "  WARN  : $WARN_COUNT"
+echo "  ERROR : $ERROR_COUNT"
+echo "-----------------------------------"
+
+# 4. Top 3 IP addresses
+echo "Top 3 Most Frequent IP Addresses:"
+cut -d' ' -f4 "$LOG_FILE" 2>> "$ERROR_LOG" > ips.tmp
+sort ips.tmp 2>> "$ERROR_LOG" > sorted_ips.tmp
+uniq -c sorted_ips.tmp 2>> "$ERROR_LOG" > counted_ips.tmp
+sort -nr counted_ips.tmp 2>> "$ERROR_LOG" > top_ips.tmp
+head -n 3 top_ips.tmp 2>> "$ERROR_LOG"
+rm -f *.tmp
+echo "-----------------------------------"
